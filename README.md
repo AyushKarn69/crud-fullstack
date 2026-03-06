@@ -32,6 +32,11 @@ PrimeTrade.ai is a comprehensive task management system that demonstrates secure
 
 ## Prerequisites
 
+### For Docker Setup (Recommended)
+- Docker v20.10+
+- Docker Compose v2.0+
+
+### For Manual Setup
 - Node.js v18 or higher
 - npm v9 or higher
 - PostgreSQL v12 or higher
@@ -39,27 +44,80 @@ PrimeTrade.ai is a comprehensive task management system that demonstrates secure
 
 ## Local Setup
 
-### 1. Clone the Repository
+### Option 1: Docker (Recommended - All-in-One)
+
+The easiest way to run the entire application with a single command.
+
+#### Prerequisites
+- Docker v20.10+
+- Docker Compose v2.0+
+
+#### Quick Start
+```bash
+# 1. Clone the repository
+git clone <repository-url>
+cd "Primetrade ai"
+
+# 2. Start all services in Docker
+docker-compose up
+
+# Services will be available at:
+# - Frontend: http://localhost:5173
+# - Backend API: http://localhost:5000/api/v1
+# - Swagger Docs: http://localhost:5000/api/docs
+# - PostgreSQL: localhost:5432 (user: postgres, password: postgres)
+```
+
+The database will be automatically migrated on first run.
+
+#### Docker Compose Services
+- **PostgreSQL**: Database service with persistent volume
+- **Backend**: Express.js API server with hot-reload
+- **Frontend**: React development server with Vite
+
+#### Stopping Services
+```bash
+# Stop all running containers
+docker-compose down
+
+# Stop and remove all data (including database)
+docker-compose down -v
+```
+
+#### Rebuilding Containers
+```bash
+# Rebuild containers after dependency changes
+docker-compose build
+
+# Rebuild and start
+docker-compose up --build
+```
+
+---
+
+### Option 2: Manual Setup (Local Node.js)
+
+#### 1. Clone the Repository
 ```bash
 git clone <repository-url>
 cd "Primetrade ai"
 ```
 
-### 2. Install Backend Dependencies
+#### 2. Install Backend Dependencies
 ```bash
 cd backend
 npm install
 ```
 
-### 3. Install Frontend Dependencies
+#### 3. Install Frontend Dependencies
 ```bash
 cd ../frontend
 npm install
 ```
 
-### 4. Configure Environment Variables
+#### 4. Configure Environment Variables
 
-#### Backend (.env)
+##### Backend (.env)
 Create a `.env` file in the `backend` directory:
 ```bash
 cp backend/.env.example backend/.env
@@ -77,7 +135,7 @@ CORS_ORIGIN=http://localhost:5173
 NODE_ENV=development
 ```
 
-#### Frontend (.env)
+##### Frontend (.env)
 Create a `.env` file in the `frontend` directory:
 ```bash
 cp frontend/.env.example frontend/.env
@@ -88,20 +146,20 @@ Edit `frontend/.env`:
 VITE_API_BASE_URL=http://localhost:5000/api/v1
 ```
 
-### 5. Run Database Migration
+#### 5. Run Database Migration
 ```bash
 cd backend
 npx prisma migrate dev --name init
 ```
 
-### 6. Start Backend Server
+#### 6. Start Backend Server
 ```bash
 cd backend
 npm run dev
 # Server will run on http://localhost:5000
 ```
 
-### 7. Start Frontend Dev Server
+#### 7. Start Frontend Dev Server
 In a new terminal:
 ```bash
 cd frontend
@@ -352,7 +410,70 @@ root/
 
 ## Troubleshooting
 
-### Database Connection Issues
+### Docker Issues
+
+#### Port Already in Use
+```bash
+# Containers can't bind to ports 5000, 5173, or 5432
+
+# View which containers are running
+docker ps
+
+# Stop conflicting containers
+docker-compose down
+
+# Check and kill processes using the ports (if not Docker)
+# Port 5000 (Linux/Mac):
+lsof -ti:5000 | xargs kill -9
+
+# Port 5000 (Windows):
+netstat -ano | findstr :5000
+taskkill /PID <PID> /F
+```
+
+#### Database Connection Failed
+```bash
+# Backend can't connect to PostgreSQL
+
+# Verify database service is running
+docker-compose ps
+
+# Check database logs
+docker-compose logs postgres
+
+# Verify DATABASE_URL in docker-compose.yml
+# Should be: postgresql://postgres:postgres@postgres:5432/primetrade_db
+```
+
+#### Application Won't Start
+```bash
+# Check all service logs
+docker-compose logs
+
+# Check specific service
+docker-compose logs backend
+docker-compose logs frontend
+
+# Rebuild containers
+docker-compose down
+docker-compose build --no-cache
+docker-compose up
+```
+
+#### Volume/Data Persistence Issues
+```bash
+# Remove all Docker data (WARNING: deletes database)
+docker-compose down -v
+
+# Remove and recreate
+docker-compose up
+```
+
+---
+
+### Local Setup Issues
+
+#### Database Connection Issues
 ```bash
 # Verify PostgreSQL is running
 pg_isready -h localhost -p 5432
@@ -361,12 +482,12 @@ pg_isready -h localhost -p 5432
 postgresql://username:password@localhost:5432/database_name
 ```
 
-### Token Not Persisting
+#### Token Not Persisting
 - Ensure cookies are enabled in browser
 - Check CORS credentials are set to `true`
 - Verify `Secure` flag is only set in production
 
-### Port Already in Use
+#### Port Already in Use
 ```bash
 # Kill process using port 5000 (Linux/Mac)
 lsof -ti:5000 | xargs kill -9
