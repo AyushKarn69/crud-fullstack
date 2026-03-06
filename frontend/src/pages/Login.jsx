@@ -1,11 +1,6 @@
-// Login page with form validation and error handling
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
 import useAuth from "../hooks/useAuth";
-import Navbar from "../components/Navbar";
-import Snowfall from "../components/Snowfall";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -14,133 +9,98 @@ const Login = () => {
   const [errors, setErrors] = useState({});
   const [serverError, setServerError] = useState("");
 
+  const validateForm = () => {
+    const newErrors = {};
+    if (!formData.email) newErrors.email = "Email required";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email))
+      newErrors.email = "Invalid email";
+    if (!formData.password) newErrors.password = "Password required";
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: "" }));
-    }
+    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setServerError("");
-    setErrors({});
-
-    if (!formData.email || !formData.password) {
-      setErrors({
-        email: !formData.email ? "Email is required" : "",
-        password: !formData.password ? "Password is required" : "",
-      });
-      return;
-    }
+    if (!validateForm()) return;
 
     const result = await login(formData.email, formData.password);
-    if (result.success) {
-      navigate("/dashboard");
-    } else {
-      setServerError(result.message);
-    }
-  };
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-    },
+    if (!result.success) setServerError(result.message);
   };
 
   return (
-    <div className="min-h-screen bg-navy-900 relative overflow-hidden">
-      <Snowfall />
-      <Navbar />
-      <div className="flex items-center justify-center min-h-[calc(100vh-64px)]">
-        <motion.div
-          className="bg-navy-800 p-8 rounded-lg shadow-xl max-w-md w-full mx-4"
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-        >
-          <motion.h1
-            className="text-3xl font-bold text-cyan-500 mb-6 text-center"
-            variants={itemVariants}
-          >
-            Welcome Back
-          </motion.h1>
+    <div className="min-h-screen bg-dark-charcoal flex items-center justify-center relative overflow-hidden">
+      <div className="fixed inset-0 z-0 pointer-events-none">
+        <div className="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-primary/10 rounded-full blur-[120px]"></div>
+        <div className="absolute -bottom-[10%] -right-[10%] w-[40%] h-[40%] bg-primary/5 rounded-full blur-[120px]"></div>
+      </div>
 
-          {serverError && (
-            <motion.div
-              className="mb-4 p-3 bg-red-600/20 border border-red-600 rounded text-red-400"
-              variants={itemVariants}
-            >
-              {serverError}
-            </motion.div>
-          )}
+      <div className="relative z-10 w-full max-w-[440px] px-6">
+        <div className="glass-card-dark rounded-xl p-10 flex flex-col items-center shadow-2xl">
+          <div className="w-16 h-16 bg-primary rounded-xl flex items-center justify-center mb-6 shadow-lg shadow-primary/20">
+            <span className="material-symbols-outlined text-white text-3xl">task_alt</span>
+          </div>
+          <h1 className="text-3xl font-bold text-white">Tasks</h1>
+          <p className="text-slate-400 mt-1 text-sm">Elevate your productivity</p>
 
-          <motion.form onSubmit={handleSubmit} variants={containerVariants}>
-            <motion.div className="mb-4" variants={itemVariants}>
-              <label className="block text-gray-300 mb-2">Email</label>
+          <form onSubmit={handleSubmit} className="w-full space-y-6 mt-8">
+            {serverError && (
+              <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 text-red-200 text-sm">
+                {serverError}
+              </div>
+            )}
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-300">Email</label>
               <input
                 type="email"
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full px-4 py-2 bg-navy-700 border border-navy-600 rounded text-white focus:outline-none focus:border-cyan-500"
-                placeholder="your@email.com"
+                placeholder="name@example.com"
+                className="w-full"
               />
-              {errors.email && (
-                <p className="text-red-400 text-sm mt-1">{errors.email}</p>
-              )}
-            </motion.div>
+              {errors.email && <p className="text-red-400 text-xs">{errors.email}</p>}
+            </div>
 
-            <motion.div className="mb-6" variants={itemVariants}>
-              <label className="block text-gray-300 mb-2">Password</label>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-300">Password</label>
               <input
                 type="password"
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
-                className="w-full px-4 py-2 bg-navy-700 border border-navy-600 rounded text-white focus:outline-none focus:border-cyan-500"
                 placeholder="••••••••"
+                className="w-full"
               />
-              {errors.password && (
-                <p className="text-red-400 text-sm mt-1">{errors.password}</p>
-              )}
-            </motion.div>
+              {errors.password && <p className="text-red-400 text-xs">{errors.password}</p>}
+            </div>
 
-            <motion.button
+            <button
               type="submit"
               disabled={loading}
-              className="w-full py-2 bg-cyan-500 text-navy-900 font-semibold rounded hover:bg-cyan-400 transition disabled:opacity-50"
-              variants={itemVariants}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+              className="w-full h-12 bg-primary text-white font-bold rounded-lg hover:bg-blue-600 disabled:opacity-50 transition-all shadow-lg shadow-primary/20"
             >
-              {loading ? "Logging in..." : "Login"}
-            </motion.button>
-          </motion.form>
+              {loading ? "Signing in..." : "Sign In"}
+            </button>
+          </form>
 
-          <motion.p className="text-center text-gray-400 mt-4" variants={itemVariants}>
-            Don't have an account?{" "}
+          <p className="text-slate-400 text-sm mt-8">
+            New user?{" "}
             <button
               onClick={() => navigate("/register")}
-              className="text-cyan-400 hover:text-cyan-300 border-b border-cyan-400"
+              className="text-primary font-semibold hover:underline"
             >
-              Register
+              Create account
             </button>
-          </motion.p>
-        </motion.div>
+          </p>
+        </div>
       </div>
     </div>
   );

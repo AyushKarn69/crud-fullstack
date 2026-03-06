@@ -1,28 +1,18 @@
-// Dashboard page with task list, filters, and management
-
 import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
 import apiClient from "../api/client";
-import Navbar from "../components/Navbar";
-import TaskCard from "../components/TaskCard";
-import Modal from "../components/Modal";
-import Toast from "../components/Toast";
-import Skeleton from "../components/Skeleton";
-import Snowfall from "../components/Snowfall";
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState("all");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [selectedTaskId, setSelectedTaskId] = useState(null);
-  const [toast, setToast] = useState({ visible: false, message: "", type: "success" });
+  const [deleteId, setDeleteId] = useState(null);
+  const [toast, setToast] = useState(null);
 
   useEffect(() => {
     fetchTasks();
@@ -32,185 +22,234 @@ const Dashboard = () => {
     setLoading(true);
     try {
       const params = { page, limit: 10 };
-      if (status !== "all") {
-        params.status = status;
-      }
-      const response = await apiClient.get("/tasks", {
-        params,
-      });
-      const { data, meta } = response.data;
-      setTasks(data);
-      setTotalPages(Math.ceil(meta.total / meta.limit));
+      if (status !== "all") params.status = status;
+      const response = await apiClient.get("/tasks", { params });
+      setTasks(response.data.data);
+      setTotalPages(Math.ceil(response.data.meta.total / 10));
     } catch (error) {
-      setToast({
-        visible: true,
-        message: "Failed to fetch tasks",
-        type: "error",
-      });
+      showToast("Failed to load tasks", "error");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDelete = (taskId) => {
-    setSelectedTaskId(taskId);
-    setDeleteModalOpen(true);
-  };
-
-  const confirmDelete = async () => {
+  const handleDelete = async () => {
     try {
-      await apiClient.delete(`/tasks/${selectedTaskId}`);
-      setTasks((prev) =>
-        prev.filter((task) => task.id !== selectedTaskId)
-      );
-      setDeleteModalOpen(false);
-      setToast({
-        visible: true,
-        message: "Task deleted successfully",
-        type: "success",
-      });
-    } catch (error) {
-      setToast({
-        visible: true,
-        message: "Failed to delete task",
-        type: "error",
-      });
+      await apiClient.delete(`/tasks/${deleteId}`);
+      setTasks((prev) => prev.filter((t) => t.id !== deleteId));
+      setDeleteId(null);
+      showToast("Task deleted", "success");
+    } catch {
+      showToast("Failed to delete task", "error");
     }
   };
 
-  const statusFilters = [
-    { value: "all", label: "All Tasks" },
-    { value: "PENDING", label: "Pending" },
-    { value: "IN_PROGRESS", label: "In Progress" },
-    { value: "DONE", label: "Done" },
-  ];
+  const handleStatusChange = async (taskId, newStatus) => {
+    try {
+      await apiClient.patch(`/tasks/${taskId}`, { status: newStatus });
+      setTasks((prev) =>
+        prev.map((t) => (t.id === taskId ? { ...t, status: newStatus } : t))
+      );
+      showToast("Task updated", "success");
+    } catch {
+      showToast("Failed to update task", "error");
+    }
+  };
+
+  const showToast = (message, type) => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
+  };
+
+  const getStatusColor = (status) => {
+    if (status === "DONE") return "bg-green-500/20 text-green-400 border-green-500/30";
+    if (status === "IN_PROGRESS") return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30";
+    return "bg-slate-500/20 text-slate-400 border-slate-500/30";
+  };
 
   return (
-    <div className="min-h-screen bg-navy-900 relative overflow-hidden">
-      <Snowfall />
-      <Navbar />
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold text-cyan-500 mb-2">
-              Welcome, {user?.email}
-            </h1>
-            <p className="text-gray-400">Manage your tasks efficiently</p>
-          </div>
-
-          <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
-            <div className="flex gap-2 flex-wrap">
-              {statusFilters.map((filter) => (
-                <motion.button
-                  key={filter.value}
-                  onClick={() => {
-                    setStatus(filter.value);
-                    setPage(1);
-                  }}
-                  className={`px-4 py-2 rounded transition ${
-                    status === filter.value
-                      ? "bg-cyan-500 text-navy-900"
-                      : "bg-navy-800 text-gray-300 hover:bg-navy-700"
-                  }`}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  {filter.label}
-                </motion.button>
-              ))}
+    <div className="min-h-screen bg-dark-charcoal">
+      {/* Header */}
+      <header className="sticky top-0 z-40 border-b border-white/5 backdrop-blur-md glass-card-dark">
+        <div className="max-w-3xl mx-auto px-6 py-6 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-primary/10 text-primary">
+              <span className="material-symbols-outlined">check_circle</span>
             </div>
-            <motion.button
-              onClick={() => navigate("/dashboard/tasks/new")}
-              className="px-6 py-2 bg-cyan-500 text-navy-900 font-semibold rounded hover:bg-cyan-400 transition"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              + New Task
-            </motion.button>
+            <h1 className="text-2xl font-bold">Tasks</h1>
           </div>
+          <div className="flex items-center gap-4">
+            <span className="text-sm text-slate-400">{user?.email}</span>
+            {user?.role === "ADMIN" && (
+              <button
+                onClick={() => navigate("/admin")}
+                className="text-sm text-primary hover:text-blue-400 transition"
+              >
+                Admin
+              </button>
+            )}
+            <button
+              onClick={logout}
+              className="text-sm text-slate-400 hover:text-white transition"
+            >
+              Logout
+            </button>
+          </div>
+        </div>
+      </header>
 
+      {/* Main */}
+      <main className="max-w-3xl mx-auto px-6 py-12 space-y-8">
+        {/* Add Task */}
+        <div className="relative group">
+          <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none z-10">
+            <span className="material-symbols-outlined text-slate-500">add</span>
+          </div>
+          <input
+            type="text"
+            placeholder="Add a task..."
+            className="w-full bg-white/5 border border-white/10 rounded-xl pl-14 pr-24 py-4 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/50 backdrop-blur-md transition-all text-lg animate-glow"
+            onKeyPress={(e) => {
+              if (e.key === "Enter" && e.target.value.trim()) {
+                navigate("/dashboard/tasks/new", { state: { title: e.target.value } });
+              }
+            }}
+          />
+          <button
+            onClick={() => navigate("/dashboard/tasks/new")}
+            className="absolute right-3 top-1/2 -translate-y-1/2 bg-primary text-white px-5 py-2 rounded-lg font-semibold text-sm transition-transform hover:scale-105 active:scale-95 shadow-lg shadow-primary/20"
+          >
+            Add
+          </button>
+        </div>
+
+        {/* Filters */}
+        <div className="flex gap-2 flex-wrap">
+          {["all", "PENDING", "IN_PROGRESS", "DONE"].map((s) => (
+            <button
+              key={s}
+              onClick={() => {
+                setStatus(s);
+                setPage(1);
+              }}
+              className={`px-4 py-2 rounded-lg font-medium text-sm transition-all ${
+                status === s
+                  ? "bg-primary text-white shadow-lg shadow-primary/20"
+                  : "bg-white/5 text-slate-300 hover:bg-white/10"
+              }`}
+            >
+              {s === "all" ? "All" : s.replace("_", " ")}
+            </button>
+          ))}
+        </div>
+
+        {/* Task List */}
+        <div className="space-y-3">
           {loading ? (
-            <motion.div
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-            >
-              {[...Array(6)].map((_, i) => (
-                <Skeleton key={i} />
-              ))}
-            </motion.div>
+            <div className="text-center py-12 text-slate-400">Loading...</div>
           ) : tasks.length === 0 ? (
-            <motion.div
-              className="text-center py-12"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-            >
-              <p className="text-gray-400 text-lg">No tasks found</p>
-            </motion.div>
+            <div className="text-center py-12 text-slate-400">No tasks yet. Create one to get started!</div>
           ) : (
-            <motion.div
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-            >
-              {tasks.map((task) => (
-                <TaskCard
-                  key={task.id}
-                  task={task}
-                  onDelete={handleDelete}
-                />
-              ))}
-            </motion.div>
+            tasks.map((task) => (
+              <div key={task.id} className="glass-card-dark rounded-lg p-5 flex items-center justify-between hover:bg-white/10 transition">
+                <div className="flex-1">
+                  <h3 className="font-semibold text-slate-100 mb-1">{task.title}</h3>
+                  {task.description && <p className="text-sm text-slate-400">{task.description}</p>}
+                  <div className="flex gap-2 mt-3 items-center">
+                    <span className={`px-3 py-1 rounded text-xs font-medium border ${getStatusColor(task.status)}`}>
+                      {task.status}
+                    </span>
+                    <span className="text-xs text-slate-500">
+                      {new Date(task.createdAt).toLocaleDateString()}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex gap-2 ml-4">
+                  <select
+                    value={task.status}
+                    onChange={(e) => handleStatusChange(task.id, e.target.value)}
+                    className="text-xs bg-white/5 border border-white/10 rounded px-2 py-1 text-slate-300"
+                  >
+                    <option value="PENDING">Pending</option>
+                    <option value="IN_PROGRESS">In Progress</option>
+                    <option value="DONE">Done</option>
+                  </select>
+                  <button
+                    onClick={() => navigate(`/dashboard/tasks/${task.id}`, { state: { task } })}
+                    className="text-primary hover:text-blue-400 text-sm"
+                  >
+                    <span className="material-symbols-outlined text-[20px]">edit</span>
+                  </button>
+                  <button
+                    onClick={() => setDeleteId(task.id)}
+                    className="text-red-400 hover:text-red-300 text-sm"
+                  >
+                    <span className="material-symbols-outlined text-[20px]">delete</span>
+                  </button>
+                </div>
+              </div>
+            ))
           )}
+        </div>
 
-          {totalPages > 1 && (
-            <motion.div
-              className="flex justify-center gap-2"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex gap-2 justify-center">
+            <button
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page === 1}
+              className="px-4 py-2 rounded-lg bg-white/5 text-slate-300 disabled:opacity-50"
             >
-              <button
-                onClick={() => setPage((prev) => Math.max(1, prev - 1))}
-                disabled={page === 1}
-                className="px-4 py-2 bg-navy-800 text-white rounded disabled:opacity-50"
-              >
-                Previous
-              </button>
-              <span className="px-4 py-2 text-gray-300">
-                Page {page} of {totalPages}
-              </span>
-              <button
-                onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
-                disabled={page === totalPages}
-                className="px-4 py-2 bg-navy-800 text-white rounded disabled:opacity-50"
-              >
-                Next
-              </button>
-            </motion.div>
-          )}
-        </motion.div>
-      </div>
+              Prev
+            </button>
+            <span className="px-4 py-2 text-slate-400">
+              {page} / {totalPages}
+            </span>
+            <button
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={page === totalPages}
+              className="px-4 py-2 rounded-lg bg-white/5 text-slate-300 disabled:opacity-50"
+            >
+              Next
+            </button>
+          </div>
+        )}
+      </main>
 
-      <Modal
-        isOpen={deleteModalOpen}
-        title="Delete Task"
-        message="Are you sure you want to delete this task? This action cannot be undone."
-        onConfirm={confirmDelete}
-        onCancel={() => setDeleteModalOpen(false)}
-        confirmText="Delete"
-        cancelText="Cancel"
-      />
+      {/* Delete Modal */}
+      {deleteId && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="glass-card-dark rounded-xl p-8 max-w-sm">
+            <h2 className="text-xl font-bold mb-4">Delete Task?</h2>
+            <p className="text-slate-300 mb-6">This action cannot be undone.</p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setDeleteId(null)}
+                className="flex-1 px-4 py-2 rounded-lg bg-white/5 text-slate-300 hover:bg-white/10"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDelete}
+                className="flex-1 px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
-      <Toast
-        message={toast.message}
-        type={toast.type}
-        isVisible={toast.visible}
-        onClose={() => setToast({ ...toast, visible: false })}
-      />
+      {/* Toast */}
+      {toast && (
+        <div className={`fixed bottom-6 right-6 px-6 py-3 rounded-lg text-sm font-medium z-50 ${
+          toast.type === "success"
+            ? "bg-green-500/20 text-green-200 border border-green-500/30"
+            : "bg-red-500/20 text-red-200 border border-red-500/30"
+        }`}>
+          {toast.message}
+        </div>
+      )}
     </div>
   );
 };

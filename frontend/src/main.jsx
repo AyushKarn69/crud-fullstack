@@ -40,7 +40,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
             }
           />
           <Route
-            path="/dashboard/tasks/:id/edit"
+            path="/dashboard/tasks/:id"
             element={
               <ProtectedRoute>
                 <EditTask />

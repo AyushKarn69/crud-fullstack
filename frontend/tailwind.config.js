@@ -4,30 +4,41 @@ export default {
     "./index.html",
     "./src/**/*.{js,jsx}",
   ],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
-        navy: {
-          50: "#f0f4f8",
-          100: "#e1e9f1",
-          200: "#c3d3e3",
-          300: "#a5bdd5",
-          400: "#87a7c7",
-          500: "#6991b9",
-          600: "#4b7bab",
-          700: "#2d659d",
-          800: "#2d4a6d",
-          900: "#0f172a",
-        },
-        cyan: {
-          50: "#f0fdfa",
-          100: "#e0fdfb",
-          300: "#84e9dc",
-          500: "#06b6d4",
-        },
+        primary: "#0A84FF",
+        "dark-charcoal": "#0f0f0f",
+        "card-bg": "#1c1c1e",
+        "bg-dark": "#0f1923",
       },
       fontFamily: {
         sans: ["Inter", "system-ui", "sans-serif"],
+      },
+      borderRadius: {
+        DEFAULT: "0.5rem",
+        lg: "1rem",
+        xl: "1.5rem",
+      },
+      animation: {
+        'glow': 'glow 2s ease-in-out infinite',
+        'slide-in': 'slideIn 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
+        'fade-in': 'fadeIn 0.5s ease-out',
+      },
+      keyframes: {
+        glow: {
+          '0%, 100%': { boxShadow: '0 0 5px rgba(10, 132, 255, 0.2)' },
+          '50%': { boxShadow: '0 0 20px rgba(10, 132, 255, 0.5)' },
+        },
+        slideIn: {
+          '0%': { transform: 'translateX(-50px)', opacity: '0' },
+          '100%': { transform: 'translateX(0)', opacity: '1' },
+        },
+        fadeIn: {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
       },
     },
   },
