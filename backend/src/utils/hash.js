@@ -1,9 +1,13 @@
 // Password hashing and comparison using bcrypt with 12 salt rounds
 
-export const hashPassword = (password) => {
-  return null;
+import bcrypt from "bcrypt";
+
+const SALT_ROUNDS = 12;
+
+export const hashPassword = async (password) => {
+  return bcrypt.hash(password, SALT_ROUNDS);
 };
 
-export const comparePassword = (password, hash) => {
-  return null;
+export const comparePassword = async (password, hash) => {
+  return bcrypt.compare(password, hash);
 };
