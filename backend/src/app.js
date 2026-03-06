@@ -5,7 +5,9 @@ import helmet from "helmet";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import rateLimit from "express-rate-limit";
+import swaggerUi from "swagger-ui-express";
 import env from "./config/env.js";
+import swaggerSpec from "./config/swagger.js";
 import authRoutes from "./routes/v1/auth.routes.js";
 import tasksRoutes from "./routes/v1/tasks.routes.js";
 import adminRoutes from "./routes/v1/admin.routes.js";
@@ -24,6 +26,8 @@ const limiter = rateLimit({
   message: "Too many requests from this IP, please try again later.",
 });
 app.use(limiter);
+
+app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/tasks", tasksRoutes);
