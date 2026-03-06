@@ -49,7 +49,7 @@ const Register = () => {
       <div className="relative z-10 w-full max-w-[440px] px-6">
         <div className="glass-card-dark rounded-xl p-10 flex flex-col items-center shadow-2xl">
           <div className="w-16 h-16 bg-primary rounded-xl flex items-center justify-center mb-6 shadow-lg shadow-primary/20">
-            <span className="material-symbols-outlined text-white text-3xl">check_circle</span>
+            <span className="material-symbols-outlined text-white text-3xl"></span>
           </div>
           <h1 className="text-3xl font-bold text-white">Create Account</h1>
           <p className="text-slate-400 mt-1 text-sm">Start managing tasks today</p>

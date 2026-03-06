@@ -17,7 +17,7 @@ const Landing = () => {
         <nav className="glass-card-dark max-w-6xl mx-auto px-8 py-4 rounded-xl flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-white">
-              <span className="material-symbols-outlined text-[20px]">check_circle</span>
+              <span className="material-symbols-outlined text-[20px]"></span>
             </div>
             <span className="text-lg font-bold tracking-tight text-white uppercase">Tasks</span>
           </div>

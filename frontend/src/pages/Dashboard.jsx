@@ -74,7 +74,7 @@ const Dashboard = () => {
         <div className="max-w-3xl mx-auto px-6 py-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-primary/10 text-primary">
-              <span className="material-symbols-outlined">check_circle</span>
+              <span className="material-symbols-outlined"></span>
             </div>
             <h1 className="text-2xl font-bold">Tasks</h1>
           </div>
@@ -103,7 +103,7 @@ const Dashboard = () => {
         {/* Add Task */}
         <div className="relative group">
           <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none z-10">
-            <span className="material-symbols-outlined text-slate-500">add</span>
+            <span className="material-symbols-outlined text-slate-500"></span>
           </div>
           <input
             type="text"
