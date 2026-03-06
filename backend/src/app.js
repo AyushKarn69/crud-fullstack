@@ -20,9 +20,10 @@ app.use(cors({ origin: env.CORS_ORIGIN, credentials: true }));
 app.use(express.json({ limit: "10kb" }));
 app.use(cookieParser());
 
+// Rate limiting disabled in development for testing; enable in production
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 100,
+  max: env.NODE_ENV === "production" ? 100 : 1000,
   message: "Too many requests from this IP, please try again later.",
 });
 app.use(limiter);

@@ -44,7 +44,7 @@ PrimeTrade.ai is a comprehensive task management system that demonstrates secure
 
 ## Local Setup
 
-### Option 1: Docker (Recommended - All-in-One)
+### Option 1: Docker 
 
 The easiest way to run the entire application with a single command.
 
@@ -409,6 +409,28 @@ root/
 - **HTTP Status Codes**: Proper status codes (200, 201, 400, 401, 403, 404, 409, 429, 500)
 
 ## Troubleshooting
+
+### Common Errors
+
+#### 429 Too Many Requests (Rate Limiting)
+```
+POST http://localhost:5000/api/v1/auth/login 429 (Too Many Requests)
+```
+
+**Cause**: Rate limiter is enabled (100 requests per 15 minutes in production, 1000 in development).
+
+**Solutions**:
+- Wait 15 minutes for the rate limit window to reset
+- In development mode, the limit is relaxed to 1000/15min
+- In production, keep strict rate limiting enabled (100/15min)
+
+Rate limiting can be configured in [backend/src/app.js](backend/src/app.js):
+```javascript
+// Current config
+max: env.NODE_ENV === "production" ? 100 : 1000,
+```
+
+---
 
 ### Docker Issues
 
