@@ -31,7 +31,11 @@ const Login = () => {
     if (!validateForm()) return;
 
     const result = await login(formData.email, formData.password);
-    if (!result.success) setServerError(result.message);
+    if (result.success) {
+      navigate("/dashboard");
+    } else {
+      setServerError(result.message);
+    }
   };
 
   return (
