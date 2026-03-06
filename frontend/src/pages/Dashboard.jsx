@@ -10,6 +10,7 @@ import TaskCard from "../components/TaskCard";
 import Modal from "../components/Modal";
 import Toast from "../components/Toast";
 import Skeleton from "../components/Skeleton";
+import Snowfall from "../components/Snowfall";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -30,9 +31,12 @@ const Dashboard = () => {
   const fetchTasks = async () => {
     setLoading(true);
     try {
-      const statusFilter = status === "all" ? "" : status;
+      const params = { page, limit: 10 };
+      if (status !== "all") {
+        params.status = status;
+      }
       const response = await apiClient.get("/tasks", {
-        params: { page, limit: 10, status: statusFilter },
+        params,
       });
       const { data, meta } = response.data;
       setTasks(data);
@@ -82,7 +86,8 @@ const Dashboard = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-navy-900">
+    <div className="min-h-screen bg-navy-900 relative overflow-hidden">
+      <Snowfall />
       <Navbar />
       <div className="max-w-6xl mx-auto px-4 py-8">
         <motion.div

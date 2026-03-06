@@ -7,6 +7,7 @@ import Navbar from "../components/Navbar";
 import Modal from "../components/Modal";
 import Toast from "../components/Toast";
 import Skeleton from "../components/Skeleton";
+import Snowfall from "../components/Snowfall";
 
 const Admin = () => {
   const [users, setUsers] = useState([]);
@@ -97,7 +98,8 @@ const Admin = () => {
   };
 
   return (
-    <div className="min-h-screen bg-navy-900">
+    <div className="min-h-screen bg-navy-900 relative overflow-hidden">
+      <Snowfall />
       <Navbar />
       <div className="max-w-7xl mx-auto px-4 py-8">
         <motion.div

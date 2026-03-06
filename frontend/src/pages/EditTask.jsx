@@ -7,6 +7,7 @@ import apiClient from "../api/client";
 import Navbar from "../components/Navbar";
 import Skeleton from "../components/Skeleton";
 import Toast from "../components/Toast";
+import Snowfall from "../components/Snowfall";
 
 const EditTask = () => {
   const navigate = useNavigate();
@@ -114,7 +115,8 @@ const EditTask = () => {
   };
 
   return (
-    <div className="min-h-screen bg-navy-900">
+    <div className="min-h-screen bg-navy-900 relative overflow-hidden">
+      <Snowfall />
       <Navbar />
       <div className="flex items-center justify-center min-h-[calc(100vh-64px)]">
         <motion.div

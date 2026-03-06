@@ -1,6 +1,7 @@
 {
   "name": "primetrade-ai-backend",
   "version": "1.0.0",
+  "type": "module",
   "description": "PrimeTrade.ai Task Management System Backend",
   "main": "src/index.js",
   "scripts": {

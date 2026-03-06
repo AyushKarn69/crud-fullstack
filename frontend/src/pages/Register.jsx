@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import useAuth from "../hooks/useAuth";
 import Navbar from "../components/Navbar";
+import Snowfall from "../components/Snowfall";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -74,7 +75,8 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen bg-navy-900">
+    <div className="min-h-screen bg-navy-900 relative overflow-hidden">
+      <Snowfall />
       <Navbar />
       <div className="flex items-center justify-center min-h-[calc(100vh-64px)]">
         <motion.div
