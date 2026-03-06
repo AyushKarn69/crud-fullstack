@@ -1,9 +1,25 @@
-// Role-based access control authorization middleware
+// Zod schema validation wrapper middleware
 
-const authorize = (...roles) => {
+import { sendError } from "../utils/response.js";
+
+const validate = (schema) => {
   return (req, res, next) => {
-    next();
+    try {
+      const validated = schema.parse({
+        body: req.body,
+        params: req.params,
+        query: req.query,
+        cookies: req.cookies,
+      });
+      next();
+    } catch (error) {
+      const errors = error.errors.map((err) => ({
+        field: err.path.join("."),
+        message: err.message,
+      }));
+      return sendError(res, "Validation failed", 400, errors);
+    }
   };
 };
 
-export default authorize;
+export default validate;

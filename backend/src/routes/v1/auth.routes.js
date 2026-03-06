@@ -3,6 +3,7 @@
 import { Router } from "express";
 import * as authController from "../../modules/auth/auth.controller.js";
 import { registerSchema, loginSchema } from "../../modules/auth/auth.schema.js";
+import validate from "../../middleware/validate.js";
 
 const router = Router();
 
@@ -33,7 +34,7 @@ const router = Router();
  *       409:
  *         description: Email already registered
  */
-router.post("/register", authController.register);
+router.post("/register", validate(registerSchema), authController.register);
 
 /**
  * @swagger
@@ -62,7 +63,7 @@ router.post("/register", authController.register);
  *       401:
  *         description: Invalid credentials
  */
-router.post("/login", authController.login);
+router.post("/login", validate(loginSchema), authController.login);
 
 /**
  * @swagger
