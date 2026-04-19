@@ -4,7 +4,7 @@ import apiClient from "../api/client";
 
 const CreateTask = () => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({ title: "", description: "", status: "PENDING" });
+  const [formData, setFormData] = useState({ title: "", description: "", dueDate: "", status: "pending" });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
@@ -27,7 +27,22 @@ const CreateTask = () => {
 
     setLoading(true);
     try {
-      await apiClient.post("/tasks", formData);
+      const payload = {
+        title: formData.title,
+        status: formData.status
+      };
+      
+      // Only add description if it's not empty
+      if (formData.description && formData.description.trim()) {
+        payload.description = formData.description;
+      }
+      
+      // Convert datetime-local to ISO 8601 if dueDate is provided
+      if (formData.dueDate && formData.dueDate.trim()) {
+        payload.dueDate = new Date(formData.dueDate).toISOString();
+      }
+      
+      await apiClient.post("/tasks", payload);
       navigate("/dashboard");
     } catch (error) {
       setErrors({ submit: error.response?.data?.message || "Failed to create task" });
@@ -81,11 +96,21 @@ const CreateTask = () => {
             </div>
 
             <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-300">Due Date</label>
+              <input
+                type="datetime-local"
+                name="dueDate"
+                value={formData.dueDate}
+                onChange={handleChange}
+                className="w-full"
+              />
+            </div>
+
+            <div className="space-y-2">
               <label className="text-sm font-medium text-slate-300">Status</label>
               <select name="status" value={formData.status} onChange={handleChange} className="w-full">
-                <option value="PENDING">Pending</option>
-                <option value="IN_PROGRESS">In Progress</option>
-                <option value="DONE">Done</option>
+                <option value="pending">Pending</option>
+                <option value="completed">Completed</option>
               </select>
             </div>
 

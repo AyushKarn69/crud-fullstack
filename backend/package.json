@@ -1,8 +1,8 @@
 {
-  "name": "primetrade-ai-backend",
+  "name": "taskmanagement-backend",
   "version": "1.0.0",
   "type": "module",
-  "description": "PrimeTrade.ai Task Management System Backend",
+  "description": "Task Management System Backend",
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
@@ -28,6 +28,7 @@
     "express-rate-limit": "7.0.0",
     "helmet": "7.0.0",
     "jsonwebtoken": "9.0.2",
+    "mongoose": "^9.4.1",
     "swagger-jsdoc": "6.2.8",
     "swagger-ui-express": "5.0.0",
     "zod": "3.22.4"

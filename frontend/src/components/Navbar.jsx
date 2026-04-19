@@ -11,7 +11,7 @@ const Navbar = () => {
   return (
     <nav className="bg-navy-800 text-white p-4 shadow-lg">
       <div className="flex justify-between items-center max-w-6xl mx-auto">
-        <h1 className="text-2xl font-bold text-cyan-500">PrimeTrade.ai</h1>
+        <h1 className="text-2xl font-bold text-cyan-500">Task Manager</h1>
         <div className="flex gap-4">
           {!isAuthenticated ? (
             <>

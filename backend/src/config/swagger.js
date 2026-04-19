@@ -6,7 +6,7 @@ const options = {
   definition: {
     openapi: "3.0.0",
     info: {
-      title: "PrimeTrade.ai Task Management API",
+      title: "Task Management API",
       version: "1.0.0",
       description: "Secure REST API for task management with JWT authentication",
     },

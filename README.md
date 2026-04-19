@@ -1,25 +1,28 @@
-# PrimeTrade.ai Task Management System
+# Task Management System
 
-A production-ready full-stack task management application with secure JWT authentication, role-based access control, and a modern animated UI.
+A production-ready full-stack task management application with secure JWT authentication, role-based access control, and dual-database architecture (PostgreSQL + MongoDB).
 
-## Project Overview
+## 🚀 Project Overview
 
-PrimeTrade.ai is a comprehensive task management system that demonstrates secure backend engineering and modern frontend architecture. The platform provides users with the ability to create, manage, filter, and organize tasks, while administrators can manage users and view all tasks across the system. The project emphasizes security, scalability, and user experience through an intuitive interface with smooth animations.
+This Task Management System is a comprehensive application demonstrating modern full-stack development with:
+- **Dual Database Architecture**: Users in PostgreSQL, Tasks in MongoDB
+- **Secure Authentication**: JWT with refresh tokens
+- **Role-Based Access Control**: USER and ADMIN roles
+- **Modern UI**: React with Tailwind CSS and animations
+- **Production Ready**: Docker containerization, comprehensive validation, error handling
 
-## Technology Stack
+## 🛠 Technology Stack
 
 ### Backend
 - **Runtime**: Node.js v18+
 - **Framework**: Express.js 4.18.2
-- **Database**: PostgreSQL with Prisma ORM 5.5.2
-- **Authentication**: JWT (access tokens + refresh tokens)
+- **Databases**: 
+  - PostgreSQL with Prisma ORM 5.5.2 (Users)
+  - MongoDB with Mongoose 8.0+ (Tasks)
+- **Authentication**: JWT (access + refresh tokens)
 - **Validation**: Zod 3.22.4
-- **Security**: 
-  - Helmet for secure HTTP headers
-  - bcrypt for password hashing (12 salt rounds)
-  - express-rate-limit for rate limiting
-  - CORS with secure origin configuration
-- **API Documentation**: Swagger/OpenAPI with swagger-ui-express
+- **Security**: Helmet, bcrypt (12 rounds), rate limiting, CORS
+- **API Documentation**: Swagger/OpenAPI
 
 ### Frontend
 - **Framework**: React 18.2.0
@@ -28,105 +31,95 @@ PrimeTrade.ai is a comprehensive task management system that demonstrates secure
 - **HTTP Client**: Axios 1.6.5
 - **Styling**: Tailwind CSS 3.4.1
 - **Animations**: Framer Motion 10.16.16
-- **Font**: Google Fonts (Inter)
 
-## Prerequisites
+## 📋 Prerequisites
 
-### For Docker Setup (Recommended)
+### Option 1: Docker (Recommended)
 - Docker v20.10+
 - Docker Compose v2.0+
 
-### For Manual Setup
-- Node.js v18 or higher
-- npm v9 or higher
-- PostgreSQL v12 or higher
-- Git
+### Option 2: Manual Setup
+- Node.js v18+
+- npm v9+
+- PostgreSQL v12+
+- MongoDB v5.0+
 
-## Local Setup
+## 🚀 Quick Start (Docker)
 
-### Option 1: Docker 
+### Option 1: Using Start Scripts
+```bash
+# Linux/Mac
+chmod +x start.sh
+./start.sh
 
-The easiest way to run the entire application with a single command.
+# Windows
+start.bat
+```
 
-#### Prerequisites
-- Docker v20.10+
-- Docker Compose v2.0+
-
-#### Quick Start
+### Option 2: Manual Docker Commands
 ```bash
 # 1. Clone the repository
 git clone <repository-url>
-cd "Primetrade ai"
+cd "Task Management System"
 
-# 2. Start all services in Docker
+# 2. Start all services
 docker-compose up
 
 # Services will be available at:
 # - Frontend: http://localhost:5173
 # - Backend API: http://localhost:5000/api/v1
 # - Swagger Docs: http://localhost:5000/api/docs
-# - PostgreSQL: localhost:5432 (user: postgres, password: postgres)
+# - PostgreSQL: localhost:5432
+# - MongoDB: localhost:27017
 ```
 
-The database will be automatically migrated on first run.
+### Docker Services
+- **PostgreSQL**: User authentication and authorization
+- **MongoDB**: Task storage and management
+- **Backend**: Express.js API server
+- **Frontend**: React development server
 
-#### Docker Compose Services
-- **PostgreSQL**: Database service with persistent volume
-- **Backend**: Express.js API server with hot-reload
-- **Frontend**: React development server with Vite
-
-#### Stopping Services
+### Docker Commands
 ```bash
-# Stop all running containers
+# Stop services
 docker-compose down
-
-# Stop and remove all data (including database)
-docker-compose down -v
-```
-
-#### Rebuilding Containers
-```bash
-# Rebuild containers after dependency changes
-docker-compose build
 
 # Rebuild and start
 docker-compose up --build
+
+# Remove all data (WARNING: deletes databases)
+docker-compose down -v
+
+# View logs
+docker-compose logs backend
+docker-compose logs frontend
 ```
 
----
+## 🔧 Manual Setup
 
-### Option 2: Manual Setup (Local Node.js)
-
-#### 1. Clone the Repository
+### 1. Install Dependencies
 ```bash
-git clone <repository-url>
-cd "Primetrade ai"
-```
-
-#### 2. Install Backend Dependencies
-```bash
+# Backend
 cd backend
 npm install
-```
 
-#### 3. Install Frontend Dependencies
-```bash
+# Frontend
 cd ../frontend
 npm install
 ```
 
-#### 4. Configure Environment Variables
+### 2. Environment Configuration
 
-##### Backend (.env)
-Create a `.env` file in the `backend` directory:
+#### Backend (.env)
 ```bash
 cp backend/.env.example backend/.env
 ```
 
-Edit `backend/.env` with your configuration:
-```
+Edit `backend/.env`:
+```env
 PORT=5000
-DATABASE_URL=postgresql://user:password@localhost:5432/primetrade_db
+DATABASE_URL=postgresql://postgres:password@localhost:5432/taskmanagement_db
+MONGO_URI=mongodb://localhost:27017/taskdb
 JWT_ACCESS_SECRET=your-super-secret-jwt-access-key-change-in-production-12345
 JWT_REFRESH_SECRET=your-super-secret-jwt-refresh-key-change-in-production-67890
 JWT_ACCESS_EXPIRES=15m
@@ -135,402 +128,624 @@ CORS_ORIGIN=http://localhost:5173
 NODE_ENV=development
 ```
 
-##### Frontend (.env)
-Create a `.env` file in the `frontend` directory:
+#### Frontend (.env)
 ```bash
 cp frontend/.env.example frontend/.env
 ```
 
 Edit `frontend/.env`:
-```
+```env
 VITE_API_BASE_URL=http://localhost:5000/api/v1
 ```
 
-#### 5. Run Database Migration
+### 3. Database Setup
+
+#### PostgreSQL
 ```bash
+# Create database
+createdb taskmanagement_db
+
+# Run migrations
 cd backend
-npx prisma migrate dev --name init
+npx prisma migrate dev
 ```
 
-#### 6. Start Backend Server
+#### MongoDB
 ```bash
+# Start MongoDB service (varies by OS)
+# Ubuntu/Debian: sudo systemctl start mongod
+# macOS: brew services start mongodb-community
+# Windows: net start MongoDB
+```
+
+### 4. Start Services
+```bash
+# Backend (Terminal 1)
 cd backend
 npm run dev
-# Server will run on http://localhost:5000
-```
 
-#### 7. Start Frontend Dev Server
-In a new terminal:
-```bash
+# Frontend (Terminal 2)
 cd frontend
 npm run dev
-# Application will run on http://localhost:5173
 ```
 
-## Environment Variables Reference
+## 📊 Database Architecture
 
-| Variable | Purpose | Example |
-|----------|---------|---------|
-| `PORT` | Backend server port | `5000` |
-| `DATABASE_URL` | PostgreSQL connection string | `postgresql://user:password@localhost:5432/primetrade_db` |
-| `JWT_ACCESS_SECRET` | Secret for signing access tokens | `your-super-secret-key` |
-| `JWT_REFRESH_SECRET` | Secret for signing refresh tokens | `your-different-secret-key` |
-| `JWT_ACCESS_EXPIRES` | Access token expiration time | `15m` |
-| `JWT_REFRESH_EXPIRES` | Refresh token expiration time | `7d` |
-| `CORS_ORIGIN` | Frontend origin for CORS | `http://localhost:5173` |
-| `NODE_ENV` | Environment mode | `development` or `production` |
-| `VITE_API_BASE_URL` | Backend API base URL | `http://localhost:5000/api/v1` |
-
-## Available Scripts
-
-### Backend
-
-```bash
-# Development server with auto-reload
-npm run dev
-
-# Start production server
-npm start
-
-# Run database migrations
-npx prisma migrate dev
-
-# Deploy migrations to production
-npx prisma migrate deploy
-
-# Open Prisma Studio
-npx prisma studio
+### Dual Database Design
+```
+┌─────────────────┐    ┌─────────────────┐
+│   PostgreSQL    │    │     MongoDB     │
+│                 │    │                 │
+│ ┌─────────────┐ │    │ ┌─────────────┐ │
+│ │    Users    │ │    │ │    Tasks    │ │
+│ │             │ │    │ │             │ │
+│ │ - id (UUID) │◄────┼─┤ - userId     │ │
+│ │ - email     │ │    │ │ - title     │ │
+│ │ - password  │ │    │ │ - desc      │ │
+│ │ - role      │ │    │ │ - dueDate   │ │
+│ │ - createdAt │ │    │ │ - status    │ │
+│ └─────────────┘ │    │ │ - createdAt │ │
+└─────────────────┘    │ │ - updatedAt │ │
+                       │ └─────────────┘ │
+                       └─────────────────┘
 ```
 
-### Frontend
+### Why Dual Database?
+- **PostgreSQL**: ACID compliance for user authentication
+- **MongoDB**: Flexible schema for task management
+- **Scalability**: Independent scaling of user and task services
+- **Performance**: Optimized queries for each data type
 
-```bash
-# Development server
-npm run dev
-
-# Build for production
-npm run build
-
-# Preview production build
-npm run preview
-```
-
-## API Reference
+## 🔐 API Documentation
 
 ### Base URL
 ```
 http://localhost:5000/api/v1
 ```
 
-### Swagger Documentation
-Interactive API documentation is available at:
+### Interactive Documentation
 ```
 http://localhost:5000/api/docs
 ```
 
 ### Authentication Endpoints
-| Method | Endpoint | Auth | Purpose |
-|--------|----------|------|---------|
-| `POST` | `/auth/register` | No | Register new user |
-| `POST` | `/auth/login` | No | Login and get access token |
-| `POST` | `/auth/refresh` | No | Get new access token using refresh cookie |
-| `POST` | `/auth/logout` | Yes | Clear refresh token cookie |
+
+#### Register User
+```http
+POST /auth/register
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "SecurePass123"
+}
+```
+
+**Response (201):**
+```json
+{
+  "success": true,
+  "message": "User registered successfully",
+  "data": {
+    "id": "uuid",
+    "email": "user@example.com",
+    "role": "USER"
+  }
+}
+```
+
+#### Login User
+```http
+POST /auth/login
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "SecurePass123"
+}
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Login successful",
+  "data": {
+    "accessToken": "jwt-token",
+    "user": {
+      "id": "uuid",
+      "email": "user@example.com",
+      "role": "USER"
+    }
+  }
+}
+```
+
+#### Refresh Token
+```http
+POST /auth/refresh
+Cookie: refreshToken=jwt-refresh-token
+```
+
+#### Logout
+```http
+POST /auth/logout
+Authorization: Bearer jwt-access-token
+```
 
 ### Task Endpoints
-| Method | Endpoint | Auth | Purpose |
-|--------|----------|------|---------|
-| `GET` | `/tasks` | Yes | List user tasks (paginated) |
-| `POST` | `/tasks` | Yes | Create new task |
-| `GET` | `/tasks/:id` | Yes | Get single task |
-| `PATCH` | `/tasks/:id` | Yes | Update task |
-| `DELETE` | `/tasks/:id` | Yes | Delete task |
 
-### Admin Endpoints
-| Method | Endpoint | Auth | Role | Purpose |
-|--------|----------|------|------|---------|
-| `GET` | `/admin/users` | Yes | ADMIN | List all users (paginated) |
-| `DELETE` | `/admin/users/:id` | Yes | ADMIN | Delete user and their tasks |
-| `GET` | `/admin/tasks` | Yes | ADMIN | List all tasks across users |
+#### Create Task
+```http
+POST /tasks
+Authorization: Bearer jwt-access-token
+Content-Type: application/json
 
-## Default Admin Credentials
-
-To create an admin user for testing:
-
-### Option 1: Manual Database Setup
-1. Use Prisma Studio: `npx prisma studio` in the backend directory
-2. Navigate to the User model
-3. Create a new record with:
-   - Email: `admin@primetrade.ai`
-   - PasswordHash: Use bcrypt to hash password `AdminPass123` (12 salt rounds)
-   - Role: `ADMIN`
-
-### Option 2: SQL Insert
-```sql
-INSERT INTO public."User" (id, email, "passwordHash", role, "createdAt") 
-VALUES (
-  'admin-uuid',
-  'admin@primetrade.ai',
-  '$2b$12$hashed-password-hash-here',
-  'ADMIN',
-  NOW()
-);
+{
+  "title": "Complete project",
+  "description": "Finish the task management system",
+  "dueDate": "2024-12-31T23:59:59.000Z",
+  "status": "pending"
+}
 ```
 
-Login with:
-- Email: `admin@primetrade.ai`
-- Password: `AdminPass123`
-
-## Security Features
-
-### Authentication & Authorization
-- **JWT Tokens**: 15-minute access tokens for stateless authentication
-- **Refresh Tokens**: 7-day refresh tokens stored in HTTP-only, Secure, SameSite cookies
-- **Password Security**: bcrypt with 12 salt rounds
-- **Role-Based Access**: USER and ADMIN role enforcement
-
-### API Security
-- **Helmet Headers**: Secure HTTP response headers via Helmet middleware
-- **CORS**: Restricted to configured origins only
-- **Rate Limiting**: 100 requests per 15 minutes per IP
-- **Input Validation**: Zod schema validation on all routes
-- **SQL Injection Protection**: Prisma parameterized queries
-
-### Token Handling
-- Access tokens stored in React state memory only (never localStorage)
-- Refresh tokens in HTTP-only cookies (not accessible to JavaScript)
-- Automatic silent refresh on 401 responses via Axios interceptor
-- Secure token rotation on refresh
-
-## Scalability Notes
-
-### Horizontal Scaling
-The application is designed for stateless, horizontal scaling:
-- **JWT Design**: Tokens are self-contained, enabling load balancing without sticky sessions
-- **Stateless API**: No server-side session storage required
-- **Database Connection Pooling**: Prisma supports connection pooling for high concurrency
-- **Load Balancer Compatible**: Works seamlessly behind load balancers (nginx, HAProxy, AWS ALB)
-
-### Performance Optimization
-- **Prisma Connection Pooling**: Configure PgBouncer or similar for database connection pooling
-- **Redis Caching**: Cache frequently accessed task lists with Redis
-- **CDN Integration**: Frontend assets can be distributed via CDN
-- **Database Indexing**: Ensure indexes on `userId`, `email`, and other frequently queried fields
-
-### Microservice Path
-Future decomposition opportunities:
-- **Auth Service**: Dedicated authentication microservice
-- **Task Service**: Separate task management service
-- **User Service**: User management and admin operations
-- **Notification Service**: Email/webhook notifications for task events
-- **Analytics Service**: Usage tracking and reporting
-
-### Production Deployment
-- **Docker**: Containerize both backend and frontend
-- **Kubernetes**: Deploy with auto-scaling and load balancing
-- **Database**: Use managed PostgreSQL (AWS RDS, Azure Database, Google Cloud SQL)
-- **Cache**: Implement Redis for session and query caching
-- **Monitoring**: Use structured logging and error tracking (Sentry, DataDog)
-- **CI/CD**: GitHub Actions, GitLab CI, or Jenkins for automated deployments
-
-## Project Structure
-
-```
-root/
-├── backend/
-│   ├── src/
-│   │   ├── config/          # Configuration files
-│   │   ├── middleware/      # Express middleware
-│   │   ├── modules/         # Feature modules (auth, tasks, users, admin)
-│   │   ├── routes/          # API routes
-│   │   ├── utils/           # Utility functions (JWT, hash, response)
-│   │   ├── app.js           # Express app setup
-│   │   └── index.js         # Server entry point
-│   ├── prisma/              # Prisma schema and migrations
-│   ├── package.json
-│   └── .env                 # Environment variables
-│
-├── frontend/
-│   ├── src/
-│   │   ├── api/             # API client and interceptors
-│   │   ├── components/      # Reusable components
-│   │   ├── context/         # React context (auth state)
-│   │   ├── hooks/           # Custom hooks
-│   │   ├── pages/           # Page components
-│   │   ├── main.jsx         # React entry point
-│   │   └── index.css        # Tailwind styles
-│   ├── index.html
-│   ├── vite.config.js
-│   ├── tailwind.config.js
-│   ├── package.json
-│   └── .env                 # Environment variables
-│
-└── README.md
-```
-
-## Testing the Application
-
-### Register and Login Flow
-1. Navigate to `http://localhost:5173`
-2. Click "Get Started" to register
-3. Create an account with email and password (minimum 8 chars, must contain uppercase, lowercase, and number)
-4. Redirect to login page
-5. Login with your credentials
-6. Redirected to dashboard on success
-
-### Task Management
-1. Create a new task by clicking "+ New Task" button
-2. Fill in title, description (optional), and status
-3. View, edit, and delete tasks from the dashboard
-4. Filter tasks by status using the tab buttons
-5. Navigate between pages using pagination controls
-
-### Admin Features (requires ADMIN role)
-1. Create an admin user via Prisma or SQL
-2. Login as admin
-3. Access /admin panel from navbar
-4. View all users and global task statistics
-5. Delete users (cascades delete their tasks)
-6. View all tasks across the system
-
-## Code Quality Standards
-
-- **Comments**: Exactly one comment per file at the top describing its purpose
-- **Validation**: Zod schemas on all backend routes
-- **Error Handling**: Centralized error handler with standardized responses
-- **Response Format**:
-  ```json
-  {
-    "success": true,
-    "message": "Operation successful",
-    "data": { ... },
-    "meta": { "page": 1, "limit": 10, "total": 42 }
+**Response (201):**
+```json
+{
+  "success": true,
+  "message": "Task created successfully",
+  "data": {
+    "_id": "mongodb-object-id",
+    "userId": "user-uuid",
+    "title": "Complete project",
+    "description": "Finish the task management system",
+    "dueDate": "2024-12-31T23:59:59.000Z",
+    "status": "pending",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
   }
-  ```
-- **HTTP Status Codes**: Proper status codes (200, 201, 400, 401, 403, 404, 409, 429, 500)
-
-## Troubleshooting
-
-### Common Errors
-
-#### 429 Too Many Requests (Rate Limiting)
-```
-POST http://localhost:5000/api/v1/auth/login 429 (Too Many Requests)
+}
 ```
 
-**Cause**: Rate limiter is enabled (100 requests per 15 minutes in production, 1000 in development).
-
-**Solutions**:
-- Wait 15 minutes for the rate limit window to reset
-- In development mode, the limit is relaxed to 1000/15min
-- In production, keep strict rate limiting enabled (100/15min)
-
-Rate limiting can be configured in [backend/src/app.js](backend/src/app.js):
-```javascript
-// Current config
-max: env.NODE_ENV === "production" ? 100 : 1000,
+#### List Tasks
+```http
+GET /tasks?page=1&limit=10&status=pending
+Authorization: Bearer jwt-access-token
 ```
 
----
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Tasks retrieved successfully",
+  "data": [
+    {
+      "_id": "mongodb-object-id",
+      "title": "Complete project",
+      "description": "Finish the task management system",
+      "dueDate": "2024-12-31T23:59:59.000Z",
+      "status": "pending",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z"
+    }
+  ],
+  "meta": {
+    "page": 1,
+    "limit": 10,
+    "total": 1
+  }
+}
+```
+
+#### Update Task
+```http
+PATCH /tasks/:id
+Authorization: Bearer jwt-access-token
+Content-Type: application/json
+
+{
+  "status": "completed"
+}
+```
+
+#### Delete Task
+```http
+DELETE /tasks/:id
+Authorization: Bearer jwt-access-token
+```
+
+### Admin Endpoints (ADMIN role required)
+
+#### List All Users
+```http
+GET /admin/users?page=1&limit=10
+Authorization: Bearer jwt-access-token
+```
+
+#### Delete User
+```http
+DELETE /admin/users/:id
+Authorization: Bearer jwt-access-token
+```
+
+#### List All Tasks
+```http
+GET /admin/tasks?page=1&limit=10
+Authorization: Bearer jwt-access-token
+```
+
+### Error Responses
+
+#### Validation Error (400)
+```json
+{
+  "success": false,
+  "message": "Validation failed",
+  "errors": [
+    {
+      "field": "title",
+      "message": "Title is required"
+    }
+  ]
+}
+```
+
+#### Authentication Error (401)
+```json
+{
+  "success": false,
+  "message": "Invalid or expired access token",
+  "errors": []
+}
+```
+
+#### Authorization Error (403)
+```json
+{
+  "success": false,
+  "message": "Insufficient permissions",
+  "errors": []
+}
+```
+
+#### Not Found Error (404)
+```json
+{
+  "success": false,
+  "message": "Task not found",
+  "errors": []
+}
+```
+
+## 📁 Project Structure & Design Decisions
+
+### Backend Architecture
+```
+backend/
+├── src/
+│   ├── config/              # Configuration files
+│   │   ├── db.js           # Prisma client (PostgreSQL)
+│   │   ├── mongo.js        # Mongoose connection (MongoDB)
+│   │   ├── env.js          # Environment validation
+│   │   └── swagger.js      # API documentation
+│   │
+│   ├── middleware/          # Express middleware
+│   │   ├── authenticate.js # JWT verification
+│   │   ├── authorize.js    # Role-based access control
+│   │   ├── validate.js     # Zod schema validation
+│   │   └── errorHandler.js # Global error handling
+│   │
+│   ├── modules/            # Feature modules (Domain-driven design)
+│   │   ├── auth/           # Authentication logic
+│   │   │   ├── auth.controller.js  # Route handlers
+│   │   │   ├── auth.service.js     # Business logic
+│   │   │   └── auth.schema.js      # Validation schemas
+│   │   │
+│   │   ├── tasks/          # Task management (MongoDB)
+│   │   │   ├── task.model.js       # Mongoose schema
+│   │   │   ├── tasks.controller.js # Route handlers
+│   │   │   ├── tasks.service.js    # Business logic
+│   │   │   └── tasks.schema.js     # Validation schemas
+│   │   │
+│   │   ├── users/          # User management (PostgreSQL)
+│   │   └── admin/          # Admin operations
+│   │
+│   ├── routes/             # API route definitions
+│   │   └── v1/             # API versioning
+│   │
+│   ├── utils/              # Utility functions
+│   │   ├── jwt.js          # Token operations
+│   │   ├── hash.js         # Password hashing
+│   │   └── response.js     # Standardized responses
+│   │
+│   ├── app.js              # Express app configuration
+│   └── index.js            # Server entry point
+│
+├── prisma/                 # PostgreSQL schema & migrations
+└── package.json
+```
+
+### Frontend Architecture
+```
+frontend/
+├── src/
+│   ├── api/                # API communication layer
+│   │   ├── client.js       # Axios configuration
+│   │   └── interceptors.js # Token refresh logic
+│   │
+│   ├── components/         # Reusable UI components
+│   │   ├── ProtectedRoute.jsx  # Authentication guard
+│   │   ├── AdminRoute.jsx      # Admin guard
+│   │   ├── Navbar.jsx          # Navigation
+│   │   └── TaskCard.jsx        # Task display
+│   │
+│   ├── context/            # Global state management
+│   │   └── AuthContext.jsx # Authentication state
+│   │
+│   ├── hooks/              # Custom React hooks
+│   │   └── useAuth.js      # Authentication hook
+│   │
+│   ├── pages/              # Route components
+│   │   ├── Landing.jsx     # Home page
+│   │   ├── Register.jsx    # User registration
+│   │   ├── Login.jsx       # User login
+│   │   ├── Dashboard.jsx   # Task dashboard
+│   │   ├── CreateTask.jsx  # Task creation
+│   │   ├── EditTask.jsx    # Task editing
+│   │   └── Admin.jsx       # Admin panel
+│   │
+│   └── main.jsx            # React entry point
+│
+├── index.html
+├── vite.config.js
+├── tailwind.config.js
+└── package.json
+```
+
+### Key Design Decisions
+
+#### 1. Dual Database Architecture
+- **Separation of Concerns**: Users (auth) vs Tasks (data)
+- **Technology Fit**: PostgreSQL for ACID, MongoDB for flexibility
+- **Scalability**: Independent scaling and optimization
+
+#### 2. Modular Backend Structure
+- **Domain-Driven Design**: Features organized by business domain
+- **Separation of Layers**: Controllers → Services → Models
+- **Single Responsibility**: Each file has one clear purpose
+
+#### 3. Security-First Approach
+- **JWT + Refresh Tokens**: Secure, stateless authentication
+- **HTTP-Only Cookies**: Refresh tokens not accessible to JavaScript
+- **Input Validation**: Zod schemas on all endpoints
+- **Rate Limiting**: DDoS protection
+
+#### 4. Error Handling Strategy
+- **Centralized Error Handler**: Consistent error responses
+- **Validation Errors**: Detailed field-level feedback
+- **Security Errors**: No information leakage
+
+#### 5. Frontend State Management
+- **Context API**: Simple, built-in state management
+- **Token Storage**: Memory (access) + HTTP-only cookies (refresh)
+- **Automatic Refresh**: Transparent token renewal
+
+## 🧪 Testing Guide
+
+### 1. User Registration & Authentication
+```bash
+# Register new user
+curl -X POST http://localhost:5000/api/v1/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","password":"TestPass123"}'
+
+# Login
+curl -X POST http://localhost:5000/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","password":"TestPass123"}' \
+  -c cookies.txt
+
+# Extract access token from response and use in subsequent requests
+```
+
+### 2. Task Management
+```bash
+# Create task
+curl -X POST http://localhost:5000/api/v1/tasks \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Test Task",
+    "description": "This is a test task",
+    "dueDate": "2024-12-31T23:59:59.000Z",
+    "status": "pending"
+  }'
+
+# List tasks
+curl -X GET "http://localhost:5000/api/v1/tasks?page=1&limit=10" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+
+# Update task
+curl -X PATCH http://localhost:5000/api/v1/tasks/TASK_ID \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"status": "completed"}'
+
+# Delete task
+curl -X DELETE http://localhost:5000/api/v1/tasks/TASK_ID \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+```
+
+### 3. Security Testing
+```bash
+# Test unauthorized access
+curl -X GET http://localhost:5000/api/v1/tasks
+# Should return 401
+
+# Test invalid token
+curl -X GET http://localhost:5000/api/v1/tasks \
+  -H "Authorization: Bearer invalid-token"
+# Should return 401
+
+# Test accessing another user's task
+curl -X GET http://localhost:5000/api/v1/tasks/OTHER_USER_TASK_ID \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
+# Should return 404 (not 403 to avoid information leakage)
+```
+
+### 4. Validation Testing
+```bash
+# Test invalid email
+curl -X POST http://localhost:5000/api/v1/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"email":"invalid-email","password":"TestPass123"}'
+# Should return 400 with validation errors
+
+# Test weak password
+curl -X POST http://localhost:5000/api/v1/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","password":"weak"}'
+# Should return 400 with validation errors
+
+# Test invalid task status
+curl -X POST http://localhost:5000/api/v1/tasks \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"title":"Test","status":"invalid-status"}'
+# Should return 400 with validation errors
+```
+
+## 🎥 Demo Video Requirements
+
+### Setup Process (1 minute)
+1. Show `docker-compose up` command
+2. Demonstrate services starting (PostgreSQL, MongoDB, Backend, Frontend)
+3. Navigate to http://localhost:5173
+
+### User Registration & Login (1 minute)
+1. Register new user with email/password
+2. Show validation (weak password rejection)
+3. Successful registration → redirect to login
+4. Login with credentials → redirect to dashboard
+
+### Task Management (2 minutes)
+1. Create new task with title, description, due date
+2. Show task in dashboard with status filtering
+3. Update task status (pending → completed)
+4. Edit task details
+5. Delete task with confirmation
+
+### Security Demonstration (1 minute)
+1. Open browser dev tools → Network tab
+2. Show JWT token in Authorization header
+3. Attempt to access another user's task (create second user)
+4. Show 404 response (security through obscurity)
+5. Demonstrate token expiration/refresh
+
+### Validation & Error Handling (30 seconds)
+1. Try creating task without title → show validation error
+2. Try invalid status value → show validation error
+3. Show rate limiting (if applicable)
+
+## 🚨 Troubleshooting
 
 ### Docker Issues
+If you encounter Docker-related problems:
+1. **Read the [Docker Setup Guide](DOCKER_SETUP_GUIDE.md)** - Complete Docker Desktop installation and setup
+2. **Check the [Troubleshooting Guide](TROUBLESHOOTING.md)** - Common issues and solutions
 
-#### Port Already in Use
+### Quick Fixes
 ```bash
-# Containers can't bind to ports 5000, 5173, or 5432
+# Docker Desktop not running
+# 1. Start Docker Desktop application
+# 2. Wait for whale icon to appear in system tray
+# 3. Run: docker info (should show system info, not error)
 
-# View which containers are running
-docker ps
-
-# Stop conflicting containers
+# Port conflicts
 docker-compose down
+netstat -ano | findstr :5000  # Windows
+lsof -ti:5000 | xargs kill -9  # Mac/Linux
 
-# Check and kill processes using the ports (if not Docker)
-# Port 5000 (Linux/Mac):
-lsof -ti:5000 | xargs kill -9
-
-# Port 5000 (Windows):
-netstat -ano | findstr :5000
-taskkill /PID <PID> /F
-```
-
-#### Database Connection Failed
-```bash
-# Backend can't connect to PostgreSQL
-
-# Verify database service is running
-docker-compose ps
-
-# Check database logs
+# Database connection issues
 docker-compose logs postgres
+docker-compose logs mongo
 
-# Verify DATABASE_URL in docker-compose.yml
-# Should be: postgresql://postgres:postgres@postgres:5432/primetrade_db
+# Complete reset (WARNING: deletes all data)
+docker-compose down --volumes --remove-orphans
+docker-compose up --build
 ```
 
-#### Application Won't Start
+### Manual Setup Issues
 ```bash
-# Check all service logs
-docker-compose logs
-
-# Check specific service
-docker-compose logs backend
-docker-compose logs frontend
-
-# Rebuild containers
-docker-compose down
-docker-compose build --no-cache
-docker-compose up
-```
-
-#### Volume/Data Persistence Issues
-```bash
-# Remove all Docker data (WARNING: deletes database)
-docker-compose down -v
-
-# Remove and recreate
-docker-compose up
-```
-
----
-
-### Local Setup Issues
-
-#### Database Connection Issues
-```bash
-# Verify PostgreSQL is running
+# PostgreSQL connection
 pg_isready -h localhost -p 5432
 
-# Check connection string format
-postgresql://username:password@localhost:5432/database_name
+# MongoDB connection
+mongosh --eval "db.adminCommand('ping')"
+
+# Node.js version
+node --version  # Should be v18+
 ```
 
-#### Token Not Persisting
-- Ensure cookies are enabled in browser
-- Check CORS credentials are set to `true`
-- Verify `Secure` flag is only set in production
+### Common Errors
+- **EADDRINUSE**: Port already in use → Kill process or change port
+- **Database connection failed**: Check database services are running
+- **JWT errors**: Verify JWT secrets in .env file
+- **CORS errors**: Check CORS_ORIGIN matches frontend URL
 
-#### Port Already in Use
-```bash
-# Kill process using port 5000 (Linux/Mac)
-lsof -ti:5000 | xargs kill -9
+## 📝 Environment Variables
 
-# Kill process using port 5000 (Windows)
-netstat -ano | findstr :5000
-taskkill /PID <PID> /F
-```
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `PORT` | Backend server port | `5000` |
+| `DATABASE_URL` | PostgreSQL connection | `postgresql://user:pass@localhost:5432/db` |
+| `MONGO_URI` | MongoDB connection | `mongodb://localhost:27017/taskdb` |
+| `JWT_ACCESS_SECRET` | Access token secret | `your-secret-key` |
+| `JWT_REFRESH_SECRET` | Refresh token secret | `your-refresh-secret` |
+| `JWT_ACCESS_EXPIRES` | Access token expiry | `15m` |
+| `JWT_REFRESH_EXPIRES` | Refresh token expiry | `7d` |
+| `CORS_ORIGIN` | Frontend URL for CORS | `http://localhost:5173` |
+| `NODE_ENV` | Environment mode | `development` |
+| `VITE_API_BASE_URL` | Backend API URL | `http://localhost:5000/api/v1` |
 
-## License
+## 🔒 Security Features
 
-MIT License - feel free to use this project for learning and development.
+- **JWT Authentication**: Stateless, secure token-based auth
+- **Refresh Token Rotation**: Automatic token renewal
+- **Password Hashing**: bcrypt with 12 salt rounds
+- **Rate Limiting**: 100 requests per 15 minutes
+- **Input Validation**: Comprehensive Zod schemas
+- **CORS Protection**: Restricted origins
+- **Helmet Security**: Secure HTTP headers
+- **SQL Injection Protection**: Parameterized queries
+- **NoSQL Injection Protection**: Mongoose sanitization
 
-## Support
+## 📈 Performance & Scalability
 
-For issues and questions, please check:
-1. API Documentation: http://localhost:5000/api/docs
-2. Database Schema: `backend/prisma/schema.prisma`
-3. Environment Configuration: `.env.example` files
+- **Database Indexing**: Optimized queries
+- **Connection Pooling**: Efficient database connections
+- **Stateless Design**: Horizontal scaling ready
+- **Caching Strategy**: Ready for Redis integration
+- **Load Balancer Compatible**: No sticky sessions required
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit changes (`git commit -m 'Add amazing feature'`)
+4. Push to branch (`git push origin feature/amazing-feature`)
+5. Open Pull Request
+
+## 📄 License
+
+MIT License - see LICENSE file for details.
+
+## 🆘 Support
+
+- **API Documentation**: http://localhost:5000/api/docs
+- **Database Schema**: `backend/prisma/schema.prisma`
+- **Environment Examples**: `.env.example` files
 
 ---
 
-Built with ❤️ for secure task management excellence.
-
+Built with ❤️ for modern task management.

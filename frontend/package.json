@@ -1,7 +1,7 @@
 {
-  "name": "primetrade-ai-frontend",
+  "name": "taskmanagement-frontend",
   "version": "1.0.0",
-  "description": "PrimeTrade.ai Task Management System Frontend",
+  "description": "Task Management System Frontend",
   "type": "module",
   "scripts": {
     "dev": "vite",

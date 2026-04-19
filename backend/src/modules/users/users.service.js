@@ -1,6 +1,7 @@
 // User management business logic for admin operations
 
 import prisma from "../../config/db.js";
+import { deleteTasksByUser } from "../tasks/tasks.service.js";
 
 const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 10;
@@ -37,6 +38,8 @@ export const deleteUserService = async (userId) => {
     throw error;
   }
 
+  // Delete MongoDB tasks first, then PostgreSQL user
+  await deleteTasksByUser(userId);
   await prisma.user.delete({ where: { id: userId } });
 
   return { message: "User deleted successfully" };

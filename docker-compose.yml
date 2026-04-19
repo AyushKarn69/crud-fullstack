@@ -1,13 +1,11 @@
-version: '3.8'
-
 services:
   postgres:
     image: postgres:15-alpine
-    container_name: primetrade_db
+    container_name: taskmanagement_db
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: primetrade_db
+      POSTGRES_DB: taskmanagement_db
     ports:
       - "5432:5432"
     volumes:
@@ -18,38 +16,57 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - primetrade
+      - taskmanagement
+
+  mongo:
+    image: mongo:7-jammy
+    container_name: taskmanagement_mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - taskmanagement
 
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: primetrade_backend
+    container_name: taskmanagement_backend
     environment:
       NODE_ENV: development
       PORT: 5000
-      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/primetrade_db
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/taskmanagement_db
       JWT_ACCESS_SECRET: your-super-secret-jwt-access-key-change-in-production-12345
       JWT_REFRESH_SECRET: your-super-secret-jwt-refresh-key-change-in-production-67890
       JWT_ACCESS_EXPIRES: 15m
       JWT_REFRESH_EXPIRES: 7d
       CORS_ORIGIN: http://localhost:5173
+      MONGO_URI: mongodb://mongo:27017/taskdb
     ports:
       - "5000:5000"
     depends_on:
       postgres:
         condition: service_healthy
+      mongo:
+        condition: service_healthy
     volumes:
       - ./backend/src:/app/src
     networks:
-      - primetrade
-    command: sh -c "npx prisma migrate deploy && npm run dev"
+      - taskmanagement
+    command: sh -c "npx prisma generate && npx prisma migrate deploy && npm run dev"
 
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: primetrade_frontend
+    container_name: taskmanagement_frontend
     environment:
       VITE_API_BASE_URL: http://localhost:5000/api/v1
     ports:
@@ -59,12 +76,13 @@ services:
     volumes:
       - ./frontend/src:/app/src
     networks:
-      - primetrade
+      - taskmanagement
     command: npm run dev
 
 volumes:
   postgres_data:
+  mongo_data:
 
 networks:
-  primetrade:
+  taskmanagement:
     driver: bridge

@@ -62,8 +62,7 @@ const Dashboard = () => {
   };
 
   const getStatusColor = (status) => {
-    if (status === "DONE") return "bg-green-500/20 text-green-400 border-green-500/30";
-    if (status === "IN_PROGRESS") return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30";
+    if (status === "completed") return "bg-green-500/20 text-green-400 border-green-500/30";
     return "bg-slate-500/20 text-slate-400 border-slate-500/30";
   };
 
@@ -125,7 +124,7 @@ const Dashboard = () => {
 
         {/* Filters */}
         <div className="flex gap-2 flex-wrap">
-          {["all", "PENDING", "IN_PROGRESS", "DONE"].map((s) => (
+          {["all", "pending", "completed"].map((s) => (
             <button
               key={s}
               onClick={() => {
@@ -138,7 +137,7 @@ const Dashboard = () => {
                   : "bg-white/5 text-slate-300 hover:bg-white/10"
               }`}
             >
-              {s === "all" ? "All" : s.replace("_", " ")}
+              {s === "all" ? "All" : s.charAt(0).toUpperCase() + s.slice(1)}
             </button>
           ))}
         </div>
@@ -170,9 +169,8 @@ const Dashboard = () => {
                     onChange={(e) => handleStatusChange(task.id, e.target.value)}
                     className="text-xs bg-white/5 border border-white/10 rounded px-2 py-1 text-slate-300"
                   >
-                    <option value="PENDING">Pending</option>
-                    <option value="IN_PROGRESS">In Progress</option>
-                    <option value="DONE">Done</option>
+                    <option value="pending">Pending</option>
+                    <option value="completed">Completed</option>
                   </select>
                   <button
                     onClick={() => navigate(`/dashboard/tasks/${task.id}`, { state: { task } })}

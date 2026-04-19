@@ -15,7 +15,10 @@ const Register = () => {
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email))
       newErrors.email = "Invalid email";
     if (!formData.password) newErrors.password = "Password required"; 
-    else if (formData.password.length < 6) newErrors.password = "Min 6 characters";
+    else if (formData.password.length < 8) newErrors.password = "Min 8 characters";
+    else if (!/[A-Z]/.test(formData.password)) newErrors.password = "Must contain uppercase";
+    else if (!/[a-z]/.test(formData.password)) newErrors.password = "Must contain lowercase";
+    else if (!/[0-9]/.test(formData.password)) newErrors.password = "Must contain number";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };

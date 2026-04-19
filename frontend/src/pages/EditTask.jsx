@@ -5,7 +5,7 @@ import apiClient from "../api/client";
 const EditTask = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const [formData, setFormData] = useState({ title: "", description: "", status: "PENDING" });
+  const [formData, setFormData] = useState({ title: "", description: "", dueDate: "", status: "pending" });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -17,7 +17,13 @@ const EditTask = () => {
   const fetchTask = async () => {
     try {
       const response = await apiClient.get(`/tasks/${id}`);
-      setFormData(response.data.data);
+      const task = response.data.data;
+      setFormData({
+        title: task.title || "",
+        description: task.description || "",
+        dueDate: task.dueDate ? new Date(task.dueDate).toISOString().slice(0, 16) : "",
+        status: task.status || "pending"
+      });
       setLoading(false);
     } catch {
       setErrors({ fetch: "Failed to load task" });
@@ -44,7 +50,22 @@ const EditTask = () => {
 
     setSubmitting(true);
     try {
-      await apiClient.patch(`/tasks/${id}`, formData);
+      const payload = {
+        title: formData.title,
+        status: formData.status
+      };
+      
+      // Only add description if it's not empty
+      if (formData.description && formData.description.trim()) {
+        payload.description = formData.description;
+      }
+      
+      // Convert datetime-local to ISO 8601 if dueDate is provided
+      if (formData.dueDate && formData.dueDate.trim()) {
+        payload.dueDate = new Date(formData.dueDate).toISOString();
+      }
+      
+      await apiClient.patch(`/tasks/${id}`, payload);
       navigate("/dashboard");
     } catch (error) {
       setErrors({ submit: error.response?.data?.message || "Failed to update task" });
@@ -109,11 +130,21 @@ const EditTask = () => {
             </div>
 
             <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-300">Due Date</label>
+              <input
+                type="datetime-local"
+                name="dueDate"
+                value={formData.dueDate}
+                onChange={handleChange}
+                className="w-full"
+              />
+            </div>
+
+            <div className="space-y-2">
               <label className="text-sm font-medium text-slate-300">Status</label>
               <select name="status" value={formData.status} onChange={handleChange} className="w-full">
-                <option value="PENDING">Pending</option>
-                <option value="IN_PROGRESS">In Progress</option>
-                <option value="DONE">Done</option>
+                <option value="pending">Pending</option>
+                <option value="completed">Completed</option>
               </select>
             </div>
 
